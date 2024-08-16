@@ -1,27 +1,102 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from "react";
 
-function App() {
-  return (
-    <div className='max-w-[900px] mx-auto bg-[#e9ecec] p-5 rounded-[10px]'>
+function Form() {
+  const nameRef = useRef("");
+  const numberRef = useRef("");
+  const descRef = useRef("");
 
-    <div className='flex flex-col '>
-      <div className='flex h-[40px] gap-1 div-1'>
-      <input
-  type="text"
-  placeholder="Type here"
-  className="input input-bordered input-warning  h-[40px] " />
-     <input
-  type="text"
-        placeholder="Type here"
-             className="input input-bordered input-warning  h-[40px] " />
-     <textarea className="border-[1px] rounded-[7px] border-[] textarea-warning py-[7px] pl-[10px] h-[40px] " placeholder="Bio"></textarea>
-       <button className='bg-[#1900ff] w-[90px] rounded-[7px] text-[#fff]  h-[40px]'>Add More</button>
-       <button className='bg-[#f00] w-[90px] rounded-[7px] text-[#ffffff]  h-[40px]'>Remove</button>
-      </div>
-      <button className='bg-[#0d00ff] w-[90px] rounded-[7px] text-[#fff]  h-[40px] mt-1'>Submit</button>
-    </div>
-    </div>
-  )
+  const [forms, setForms] = useState([{ name: "", number: "", desc: "" }]);
+
+  useEffect(() => {
+    const savedForms = localStorage.getItem("forms");
+    if (savedForms) {
+      setForms(JSON.parse(savedForms));
+    }
+  }, []);
+
+  function handleAdd(event) {
+    event.preventDefault();
+    const newForm = forms.concat({ name: "", number: "", desc: "" });
+    setForms(newForm);
+  }
+
+  function handleDelete(event) {
+    event.preventDefault();
+    if (forms.length > 1) {
+      const deletedForm = [...forms];
+      deletedForm.pop();
+      setForms(deletedForm);
+    } else {
+      alert("Cannot delete last form");
+    }
+  }
+
+function handleChange(index, field, value) {
+   const updatadForms = [...forms]
+   updatadForms[index][field] = value
+   setForms(updatadForms)
 }
 
-export default App
+
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    localStorage.setItem("forms", JSON.stringify(forms));
+  }
+
+  return (
+    <div className="flex flex-col justify-center items-center max-w-[1000px] mx-auto ">
+      {forms.map((_, index) => (
+        <div key={index} className="card1">
+          <form className="flex gap-4  mb-5">
+            <input
+             value={forms.name}
+             onChange={(e) => handleChange(index, 'name', e.target.value)}
+              type="text"
+              placeholder="Hemant"
+              className="input input-bordered input-info w-full"
+            />
+            <input
+               value={forms.number}
+               onChange={(e) => handleChange(index, 'number', e.target.value)}
+              type="number"
+              placeholder="123"
+              className="input input-bordered input-info w-full"
+            />
+            <input
+              value={forms.desc}
+              onChange={(e) => handleChange(index, 'desc', e.target.value)}
+              type="text"
+              placeholder="For testing remarks"
+              className="input input-bordered input-info w-full"
+            />
+            <button
+              onClick={handleDelete}
+              className="w-40 border  px-2 bg-red-500 rounded-md text-white"
+            >
+              Remove
+            </button>
+          </form>
+        </div>
+      ))}
+       <div className="w-full flex items-start gap-2">
+
+      <button
+        onClick={handleAdd}
+        className="w-40 border h-10 bg-[#2998ff] rounded-md text-white mt-4"
+        >
+        Add more
+      </button>
+
+      <button
+        onClick={handleSubmit}
+        className="w-40 border h-10 bg-[#35f627] rounded-md text-white mt-4"
+        >
+        Submit
+      </button>
+        </div>
+    </div>
+  );
+}
+
+export default Form;
